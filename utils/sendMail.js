@@ -7,10 +7,7 @@ const PASS = process.env.GMAIL_PASS;
 async function sendMail(email, url) {
   const transporter = nodemailer.createTransport({
     // service: "gmail",
-    host: "smtp.gmail.com",
-    port: 587,
-    ignoreTLS: false,
-    secure: false,
+    service: "hotmail",
     auth: {
       user: USER,
       pass: PASS,
