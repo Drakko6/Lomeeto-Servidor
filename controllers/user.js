@@ -26,7 +26,6 @@ function createToken(user, SECRET_KEY, expiresIn) {
 
 async function register(input) {
   const newUser = input;
-  console.log(input);
   newUser.email = newUser.email.toLowerCase();
   newUser.username = newUser.username.toLowerCase();
   const { email, username, password } = newUser;
@@ -201,6 +200,7 @@ async function confirmUser(token) {
       { confirmed: true }
     );
 
+    //confirm._id
     await Confirmation.findOneAndDelete({ token });
 
     return true;
