@@ -1,19 +1,7 @@
 const nodemailer = require("nodemailer");
 require("dotenv").config({ path: ".env" });
 
-const USER = process.env.GMAIL_EMAIL;
-const PASS = process.env.GMAIL_PASS;
-
 async function sendMail(email, url) {
-  // const transporter = nodemailer.createTransport({
-  //   // service: "gmail",
-  //   service: "hotmail",
-  //   auth: {
-  //     user: USER,
-  //     pass: PASS,
-  //   },
-  // });
-
   const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 465,
@@ -44,8 +32,6 @@ async function sendMail(email, url) {
   console.log(info);
 
   console.log("Message sent: %s", info.messageId);
-
-  // console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
 }
 
 module.exports = sendMail;

@@ -11,6 +11,13 @@ async function follow(username, ctx) {
       follow: userFound._id,
     });
 
+    // TO DO:
+    // Es un negocio? Consultar BD USER  Ver bandera
+    //Si es negocio, buscar Rating con idUser y tipo de negocio y aumentar el contador
+    // (Si no existe crear un nuevo rating )
+    //Consultará y devolverá un array de los ratings de la BD
+    //  Llamar al metodo de clusterize(array) para actualizarlo
+
     follow.save();
     return true;
   } catch (error) {
@@ -87,12 +94,12 @@ async function getNotFolloweds(ctx) {
 
     if (!isFind) {
       if (
+        //que no es el mismo usuario
+        // condicion que es mismo estado y ciudad
         user._id.toString() !== ctx.user.id.toString() &&
         user.state === ctx.user.state &&
         user.town == ctx.user.town
       ) {
-        //que no es el mismo usuario
-        //agregar condicion que es mismo estado y ciudad
         arrayUsers.push(user);
       }
     }
@@ -100,6 +107,15 @@ async function getNotFolloweds(ctx) {
 
   return arrayUsers;
 }
+
+//  TO DO:
+//  que en el registro se pregunte el tipo y se ponga diferente formulario, lo de preferencias igual (FRONT)
+
+//  se usará una bandera para saber si es negocio -> Cambiar las opciones dependiendo de esto  BUSSINESS?  (FRONT)
+//  CAMBIAR EL REGISTRO PARA QUE GUARDE ESTA INFO (FRONT)
+
+// en el feed se presentarán posts con la etiqueta publicidad, mezclados con los de seguidos (FRONT)
+// (Se deben mezclar en el FRONT las dos consultas)
 
 module.exports = {
   follow,

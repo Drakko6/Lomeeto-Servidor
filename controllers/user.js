@@ -25,16 +25,19 @@ function createToken(user, SECRET_KEY, expiresIn) {
 }
 
 async function register(input) {
+  //TO DO:
+  // Hacer que recoja las recomendaciones y hacer primer clusterización (llamar a clusterize(arrayRatings))
+
   const newUser = input;
   newUser.email = newUser.email.toLowerCase();
   newUser.username = newUser.username.toLowerCase();
   const { email, username, password } = newUser;
 
-  //Revisamos si el correo esta en uso
+  //Revisamos si el correo está en uso
   const foundEmail = await User.findOne({ email });
   if (foundEmail) throw new Error("El email ya está en uso");
 
-  //Revisamos si el username esta en uso
+  //Revisamos si el username está en uso
   const foundUsername = await User.findOne({ username });
   if (foundUsername) throw new Error("El nombre de usuario ya está en uso");
 

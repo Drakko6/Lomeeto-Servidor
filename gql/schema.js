@@ -1,6 +1,8 @@
 const { gql } = require("apollo-server");
 
 const typeDefs = gql`
+  #######################TYPES#################################3
+
   type User {
     id: ID
     name: String
@@ -18,6 +20,20 @@ const typeDefs = gql`
     confirmed: Boolean
     state: String
     town: String
+
+    #relacionadas a si es negocio
+    business: Boolean
+    type: String
+    address: String
+    phone: [String]
+    contactEmail: String
+    schedule: [Hour]
+  }
+
+  type Rating {
+    idUser: ID!
+    type: String!
+    rating: Int!
   }
 
   type Token {
@@ -59,7 +75,12 @@ const typeDefs = gql`
     text: String
   }
 
-  #INPUTS
+  type Hour {
+    day: String
+    hour: String
+  }
+
+  #####################################INPUTS#####################################
   input UserInput {
     name: String!
     username: String!
@@ -67,6 +88,19 @@ const typeDefs = gql`
     password: String!
     state: String!
     town: String!
+
+    preferences: [String]
+    business: Boolean
+    address: String
+    type: String
+    phone: [String]
+    contactEmail: String
+    schedule: [HourInput]
+  }
+
+  input HourInput {
+    day: String
+    hour: String
   }
 
   input LoginInput {
@@ -96,7 +130,7 @@ const typeDefs = gql`
     text: String
   }
 
-  #QUERY
+  ####################################QUERY#########################################
   type Query {
     #User
     getUser(id: ID, username: String): User
@@ -120,6 +154,7 @@ const typeDefs = gql`
     countLikes(idPost: ID!): Int
   }
 
+  ####################################MUTATION############################################
   type Mutation {
     #User
     register(input: UserInput): User

@@ -89,6 +89,15 @@ async function getPostFolloweds(ctx) {
   return result;
 }
 
+// TO DO:
+//  Hacer un query que te dé las sugerencias, para ello se necesita: (BACK)
+//  En el "feed" se llamará a una query que hará la recomendación...
+// QUERY DE SUGERENCIAS (POSTS)
+//  Recoge ID de usuario, cuántos se recomiendan (3), usa archivo de cluster
+// Arrojará recomendacion de tipos de negocios
+// Con base en la data se desplegarán posts de usuarios NEGOCIOS  NO SEGUIDOS de los tipos recomendados
+// -> Hacer una búsqueda de usuarios y sacar sus posts
+
 module.exports = {
   publish,
   getPosts,

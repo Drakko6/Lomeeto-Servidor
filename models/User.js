@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+//modelo de hora para horario
 
 const UserSchema = Schema(
   {
@@ -54,15 +55,6 @@ const UserSchema = Schema(
       require: true,
       trim: true,
     },
-    // createAt: {
-    //   type: Date,
-    //   default: Date.now(),
-    // },
-    //para confirmar por correo
-    confirmed: {
-      type: Boolean,
-      default: false,
-    },
     state: {
       type: String,
       trim: true,
@@ -73,6 +65,50 @@ const UserSchema = Schema(
       trim: true,
       require: true,
     },
+
+    //para confirmar por correo
+    confirmed: {
+      type: Boolean,
+      default: false,
+    },
+
+    // Array con primeras preferencias
+    preferences: {
+      type: [String],
+      require: true,
+    },
+
+    //  Propiedades relacionadas a si es un negocio
+    business: {
+      type: Boolean,
+      default: false,
+    },
+
+    address: {
+      type: String,
+      trim: true,
+    },
+
+    //   tipo de producto
+    type: {
+      type: String,
+      trim: true,
+    },
+
+    // Array de telefonos de contacto
+    phone: {
+      type: [String],
+      trim: true,
+    },
+
+    //  Correo de contacto
+    contactEmail: {
+      type: String,
+      trim: true,
+    },
+
+    //  Array de objetos para horario (dia y hora)
+    schedule: [Object],
   },
 
   {
