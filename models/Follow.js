@@ -16,10 +16,6 @@ const FollowSchema = Schema(
       require: true,
       ref: "User",
     },
-    // createAt: {
-    //   type: Date,
-    //   default: Date.now(),
-    // },
   },
 
   {

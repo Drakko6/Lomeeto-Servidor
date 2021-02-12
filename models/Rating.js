@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 
 const RatingSchema = Schema({
   //  ID de usuario
-  idUser: {
+  user: {
     type: mongoose.Schema.Types.ObjectId,
     require: true,
     ref: "User",

@@ -3,10 +3,9 @@ const awsUploadImage = require("../utils/aws-upload-image");
 const { v4: uuidv4 } = require("uuid");
 const User = require("../models/User");
 const Follow = require("../models/Follow");
+const recommender = require("recommender-node");
 
 async function publish(input, ctx) {
-  console.log(input);
-
   const { id } = ctx.user;
   const { createReadStream, mimetype } = await input.file;
   const extension = mimetype.split("/")[1];
@@ -90,16 +89,68 @@ async function getPostFolloweds(ctx) {
 }
 
 // TO DO:
-//  Hacer un query que te dé las sugerencias, para ello se necesita: (BACK)
-//  En el "feed" se llamará a una query que hará la recomendación...
-// QUERY DE SUGERENCIAS (POSTS)
-//  Recoge ID de usuario, cuántos se recomiendan (3), usa archivo de cluster
-// Arrojará recomendacion de tipos de negocios
-// Con base en la data se desplegarán posts de usuarios NEGOCIOS  NO SEGUIDOS de los tipos recomendados
-// -> Hacer una búsqueda de usuarios y sacar sus posts
+//QUERY PARA SUGERENCIAS (REVISAR)
+async function getRecommendedPosts(ctx) {
+  recommender
+    .recommend(ctx.user.id, 3, "../utils/clusters.json")
+    .then((items) => {
+      //items recomendados
+      console.log("items: " + JSON.stringify(items));
+      console.log(items);
+
+      //Buscar los posts de usuarios NEGOCIOS NO SEGUIDOS DE LOS TIPOS RECOMENDADOS
+      //  Se sacan los usuarios negocio de los tipos recomendados
+
+      businesses = [];
+      items.forEach(async (type) => {
+        const user = await User.find({ business: true })
+          .where("type")
+          .equals(type);
+
+        businesses.push(user);
+      });
+
+      // Se recorren los negocios para saber si se siguen y así sacar sus posts
+
+      recommendedBuses = [];
+
+      // for await (const business of businesses) {
+      businesses.forEach(async (business) => {
+        const isFind = await Follow.findOne({ idUser: ctx.user.id })
+          .where("follow")
+          .equals(business._id);
+
+        if (!isFind) {
+          //Si no se sigue, se verifica que sea de la misma ciudad y no sea al mismo usuario
+          if (
+            business._id.toString() !== ctx.user.id.toString() &&
+            business.state === ctx.user.state &&
+            business.town == ctx.user.town
+          ) {
+            recommendedBuses.push(business);
+          }
+        }
+      });
+
+      //Se tendrá un array de usuarios negocios, buscar los posts de estos y pushear a un array para devolverlos
+
+      let posts = [];
+
+      recommendedBuses.forEach(async (bus) => {
+        let busPosts = await Post.find()
+          .where({ idUser: bus._id })
+          .sort({ createdAt: -1 })
+          .populate("idUser");
+        posts.push(busPosts);
+      });
+
+      return posts;
+    });
+}
 
 module.exports = {
   publish,
   getPosts,
   getPostFolloweds,
+  getRecommendedPosts,
 };

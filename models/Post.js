@@ -22,10 +22,10 @@ const PostSchema = Schema(
       type: String,
       trim: true,
     },
-    // createAt: {
-    //   type: Date,
-    //   default: Date.now(),
-    // },
+    ad: {
+      type: Boolean,
+      default: false,
+    },
   },
 
   {

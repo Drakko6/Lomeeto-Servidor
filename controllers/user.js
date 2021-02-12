@@ -3,7 +3,10 @@ const Follow = require("../models/Follow");
 const Comment = require("../models/Comment");
 const Post = require("../models/Post");
 const Like = require("../models/like");
+const Rating = require("../models/Rating");
+
 const Confirmation = require("../models/Confirmation");
+const clusterize = require("../utils/clusterize");
 
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -25,9 +28,6 @@ function createToken(user, SECRET_KEY, expiresIn) {
 }
 
 async function register(input) {
-  //TO DO:
-  // Hacer que recoja las recomendaciones y hacer primer clusterización (llamar a clusterize(arrayRatings))
-
   const newUser = input;
   newUser.email = newUser.email.toLowerCase();
   newUser.username = newUser.username.toLowerCase();
@@ -45,14 +45,55 @@ async function register(input) {
   const salt = await bcryptjs.genSaltSync(10);
   newUser.password = await bcryptjs.hash(password, salt);
 
-  try {
-    const user = new User(newUser);
-    user.save();
+  if (!foundEmail && !foundUsername) {
+    try {
+      const user = new User(newUser);
+      user.save();
 
-    await sendMail(newUser.email, createConfirmationUrl(user._id));
-    return user;
-  } catch (error) {
-    console.log(error);
+      //TO DO:
+      // Hacer que recoja las recomendaciones y hacer primer clusterización (llamar a clusterize(arrayRatings))
+
+      const firstRatings = newUser.preferences;
+      //Guardar los primeros Ratings (3)
+
+      for await (const preference of firstRatings) {
+        let newRating = new Rating({
+          user: user._id,
+          type: preference,
+          rating: 1,
+        });
+
+        await newRating.save();
+      }
+
+      //llamar a clusterize para actualizar
+      const ratings = await Rating.find();
+
+      const cleanRatings = [];
+
+      for (rat of ratings) {
+        const newRat = {
+          user: rat.user.toString(),
+          item: rat.type,
+          rating: rat.rating.toString(),
+        };
+
+        cleanRatings.push(newRat);
+      }
+
+      await sendMail(newUser.email, createConfirmationUrl(user._id));
+
+      //BUG: Se recarga el server cuando escribimos el clusters.json
+      // TO DO: Cambiar clusterize para que guarde los clusters en MongoDB
+      //  Hacer Entidad Cluster con la propiedad tipo objeto ->
+      // Cambiar el módulo recommender para que altere la base de datos (El objeto)
+      // Y para que recupere de ahí también
+      // await clusterize(cleanRatings);
+
+      return user;
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   return null;

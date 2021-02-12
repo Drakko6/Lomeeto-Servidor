@@ -1,5 +1,7 @@
 const Follow = require("../models/Follow");
 const User = require("../models/User");
+const Rating = require("../models/Rating");
+const clusterize = require("../utils/clusterize");
 
 async function follow(username, ctx) {
   const userFound = await User.findOne({ username });
@@ -13,10 +15,32 @@ async function follow(username, ctx) {
 
     // TO DO:
     // Es un negocio? Consultar BD USER  Ver bandera
-    //Si es negocio, buscar Rating con idUser y tipo de negocio y aumentar el contador
-    // (Si no existe crear un nuevo rating )
+    if (userFound.business) {
+      //Si es negocio, buscar Rating con idUser y tipo de negocio y aumentar el contador
+
+      const foundRating = await Rating.findOne({ idUser: ctx.user.id });
+
+      await Rating.findByIdAndUpdate(ctx.user.id, { rating: this.rating + 1 });
+
+      if (!foundRating) {
+        // (Si no existe crear un nuevo rating )
+        const newRating = new Rating({
+          idUser: ctx.user.id,
+          type: userFound.type,
+          rating: 1,
+        });
+
+        newRating.save();
+      }
+    }
+
     //Consultará y devolverá un array de los ratings de la BD
     //  Llamar al metodo de clusterize(array) para actualizarlo
+    const ratings = await Rating.find();
+
+    console.log(ratings);
+
+    clusterize(ratings);
 
     follow.save();
     return true;
@@ -83,7 +107,7 @@ async function getFolloweds(username) {
 }
 
 async function getNotFolloweds(ctx) {
-  const users = await User.find().limit(50);
+  const users = await User.find().limit(20);
 
   const arrayUsers = [];
 

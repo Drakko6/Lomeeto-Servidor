@@ -21,6 +21,9 @@ const typeDefs = gql`
     state: String
     town: String
 
+    #preferencias de negocios
+    preferences: [String]
+
     #relacionadas a si es negocio
     business: Boolean
     type: String
@@ -31,7 +34,7 @@ const typeDefs = gql`
   }
 
   type Rating {
-    idUser: ID!
+    user: ID!
     type: String!
     rating: Int!
   }
@@ -57,6 +60,8 @@ const typeDefs = gql`
     typeFile: String
     createdAt: String
     text: String
+    #Si es publicidad
+    ad: Boolean
   }
 
   type Comment {
@@ -73,6 +78,7 @@ const typeDefs = gql`
     typeFile: String
     createdAt: String
     text: String
+    ad: Boolean
   }
 
   type Hour {
@@ -89,6 +95,7 @@ const typeDefs = gql`
     state: String!
     town: String!
 
+    ####Propiedades si es un negocio#######
     preferences: [String]
     business: Boolean
     address: String
@@ -145,6 +152,10 @@ const typeDefs = gql`
     #Post
     getPosts(username: String!): [Post]
     getPostFolloweds: [FeedPost]
+
+    ##TO DO
+    ###Para obtener post publicitarios
+    getRecommendedPosts: [FeedPost]
 
     #Comment
     getComments(idPost: ID!): [Comment]
