@@ -12,6 +12,7 @@ mongoose.connect(
     useUnifiedTopology: true,
     useFindAndModify: true,
     useCreateIndex: true,
+    useFindAndModify: false,
   },
   (err, _) => {
     if (err) {

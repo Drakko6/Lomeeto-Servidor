@@ -13,34 +13,51 @@ async function follow(username, ctx) {
       follow: userFound._id,
     });
 
-    // TO DO:
     // Es un negocio? Consultar BD USER  Ver bandera
     if (userFound.business) {
-      //Si es negocio, buscar Rating con idUser y tipo de negocio y aumentar el contador
+      //Si es negocio, buscar Rating con id de user y tipo de negocio y aumentar el contador
+      const foundRating = await Rating.findOne({
+        user: ctx.user.id,
+        type: userFound.type,
+      });
 
-      const foundRating = await Rating.findOne({ idUser: ctx.user.id });
-
-      await Rating.findByIdAndUpdate(ctx.user.id, { rating: this.rating + 1 });
-
-      if (!foundRating) {
+      if (foundRating) {
+        await Rating.findOneAndUpdate(
+          { user: ctx.user.id },
+          {
+            rating: foundRating.rating + 1,
+          }
+        );
+      } else if (!foundRating) {
         // (Si no existe crear un nuevo rating )
         const newRating = new Rating({
-          idUser: ctx.user.id,
+          user: ctx.user.id,
           type: userFound.type,
           rating: 1,
         });
 
-        newRating.save();
+        await newRating.save();
       }
+
+      //Consultará y devolverá un array de los ratings de la BD
+      const ratings = await Rating.find();
+
+      //limpiar array de ratings
+      const cleanRatings = [];
+
+      for (rat of ratings) {
+        const newRat = {
+          user: rat.user.toString(),
+          item: rat.type,
+          rating: rat.rating.toString(),
+        };
+
+        cleanRatings.push(newRat);
+      }
+
+      //  Llamar al metodo de clusterize(array) para actualizarlo
+      clusterize(cleanRatings);
     }
-
-    //Consultará y devolverá un array de los ratings de la BD
-    //  Llamar al metodo de clusterize(array) para actualizarlo
-    const ratings = await Rating.find();
-
-    console.log(ratings);
-
-    clusterize(ratings);
 
     follow.save();
     return true;
@@ -131,15 +148,6 @@ async function getNotFolloweds(ctx) {
 
   return arrayUsers;
 }
-
-//  TO DO:
-//  que en el registro se pregunte el tipo y se ponga diferente formulario, lo de preferencias igual (FRONT)
-
-//  se usará una bandera para saber si es negocio -> Cambiar las opciones dependiendo de esto  BUSSINESS?  (FRONT)
-//  CAMBIAR EL REGISTRO PARA QUE GUARDE ESTA INFO (FRONT)
-
-// en el feed se presentarán posts con la etiqueta publicidad, mezclados con los de seguidos (FRONT)
-// (Se deben mezclar en el FRONT las dos consultas)
 
 module.exports = {
   follow,

@@ -50,7 +50,6 @@ async function register(input) {
       const user = new User(newUser);
       user.save();
 
-      //TO DO:
       // Hacer que recoja las recomendaciones y hacer primer clusterización (llamar a clusterize(arrayRatings))
 
       const firstRatings = newUser.preferences;
@@ -83,12 +82,7 @@ async function register(input) {
 
       await sendMail(newUser.email, createConfirmationUrl(user._id));
 
-      //BUG: Se recarga el server cuando escribimos el clusters.json
-      // TO DO: Cambiar clusterize para que guarde los clusters en MongoDB
-      //  Hacer Entidad Cluster con la propiedad tipo objeto ->
-      // Cambiar el módulo recommender para que altere la base de datos (El objeto)
-      // Y para que recupere de ahí también
-      // await clusterize(cleanRatings);
+      await clusterize(cleanRatings);
 
       return user;
     } catch (error) {

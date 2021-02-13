@@ -153,7 +153,6 @@ const typeDefs = gql`
     getPosts(username: String!): [Post]
     getPostFolloweds: [FeedPost]
 
-    ##TO DO
     ###Para obtener post publicitarios
     getRecommendedPosts: [FeedPost]
 

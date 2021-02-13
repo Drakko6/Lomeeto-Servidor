@@ -3,7 +3,7 @@ const awsUploadImage = require("../utils/aws-upload-image");
 const { v4: uuidv4 } = require("uuid");
 const User = require("../models/User");
 const Follow = require("../models/Follow");
-const recommender = require("recommender-node");
+const recommender = require("../utils/recommender-node");
 
 async function publish(input, ctx) {
   const { id } = ctx.user;
@@ -88,64 +88,57 @@ async function getPostFolloweds(ctx) {
   return result;
 }
 
-// TO DO:
-//QUERY PARA SUGERENCIAS (REVISAR)
+//QUERY PARA SUGERENCIAS
 async function getRecommendedPosts(ctx) {
-  recommender
-    .recommend(ctx.user.id, 3, "../utils/clusters.json")
-    .then((items) => {
-      //items recomendados
-      console.log("items: " + JSON.stringify(items));
-      console.log(items);
+  let businesses = [];
 
-      //Buscar los posts de usuarios NEGOCIOS NO SEGUIDOS DE LOS TIPOS RECOMENDADOS
-      //  Se sacan los usuarios negocio de los tipos recomendados
+  const items = await recommender.recommend(ctx.user.id, 3);
 
-      businesses = [];
-      items.forEach(async (type) => {
-        const user = await User.find({ business: true })
-          .where("type")
-          .equals(type);
+  //Buscar los posts de usuarios NEGOCIOS NO SEGUIDOS DE LOS TIPOS RECOMENDADOS
+  //  Se sacan los usuarios negocio de los tipos recomendados
+  for await (const type of items) {
+    const users = await User.find({ business: true })
+      .where("type")
+      .equals(type.itemId);
 
-        businesses.push(user);
-      });
+    businesses.push(...users);
+  }
 
-      // Se recorren los negocios para saber si se siguen y así sacar sus posts
+  // Se recorren los negocios para saber si se siguen y así sacar sus posts
+  const recommendedBuses = [];
 
-      recommendedBuses = [];
+  for await (const business of businesses) {
+    //businesses.forEach(async (business) => {
+    const isFind = await Follow.findOne({ idUser: ctx.user.id })
+      .where("follow")
+      .equals(business._id);
 
-      // for await (const business of businesses) {
-      businesses.forEach(async (business) => {
-        const isFind = await Follow.findOne({ idUser: ctx.user.id })
-          .where("follow")
-          .equals(business._id);
+    if (!isFind) {
+      //Si no se sigue, se verifica que sea de la misma ciudad y no sea al mismo usuario
+      if (
+        business._id.toString() !== ctx.user.id.toString() &&
+        business.state === ctx.user.state &&
+        business.town == ctx.user.town
+      ) {
+        recommendedBuses.push(business);
+      }
+    }
+  }
 
-        if (!isFind) {
-          //Si no se sigue, se verifica que sea de la misma ciudad y no sea al mismo usuario
-          if (
-            business._id.toString() !== ctx.user.id.toString() &&
-            business.state === ctx.user.state &&
-            business.town == ctx.user.town
-          ) {
-            recommendedBuses.push(business);
-          }
-        }
-      });
+  //Se tendrá un array de usuarios negocios, buscar los posts de estos y pushear a un array para devolverlos
 
-      //Se tendrá un array de usuarios negocios, buscar los posts de estos y pushear a un array para devolverlos
+  let posts = [];
 
-      let posts = [];
+  for await (const bus of recommendedBuses) {
+    // recommendedBuses.forEach(async (bus) => {
+    let busPosts = await Post.find()
+      .where({ idUser: bus._id })
+      .sort({ createdAt: -1 })
+      .populate("idUser");
+    posts.push(...busPosts);
+  }
 
-      recommendedBuses.forEach(async (bus) => {
-        let busPosts = await Post.find()
-          .where({ idUser: bus._id })
-          .sort({ createdAt: -1 })
-          .populate("idUser");
-        posts.push(busPosts);
-      });
-
-      return posts;
-    });
+  return posts;
 }
 
 module.exports = {

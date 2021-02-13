@@ -21,6 +21,8 @@ const resolvers = {
     //Post
     getPosts: (_, { username }) => postController.getPosts(username),
     getPostFolloweds: (_, {}, ctx) => postController.getPostFolloweds(ctx), //del contexto se saca el id del usuario logueado
+    getRecommendedPosts: (_, {}, ctx) =>
+      postController.getRecommendedPosts(ctx), //del contexto se saca el id del usuario logueado
 
     //Comment
     getComments: (_, { idPost }) => commentController.getComments(idPost),
