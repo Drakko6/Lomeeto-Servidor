@@ -13,9 +13,9 @@ async function sendMail(email, url) {
         "298460132135-mlb1tjr3uncleans8u5e85qihgh6jq55.apps.googleusercontent.com",
       clientSecret: "GL9J0nXldWzOX8qjLxvI1OA1",
       refreshToken:
-        "1//04znwke6VZSo5CgYIARAAGAQSNwF-L9IrcACvR97LYNW6iE_qitTIVGVilv-SMwooI4wYRhhYs_yjbH-RfmJ_uqNdJDC0A-KT2Bc",
+        "1//04YOpMOd-pG6fCgYIARAAGAQSNwF-L9Ir915CVoGqYo-u6k8Ge3VjHeReiU3REUF3xJdgbg_tkDuphdwkNS3DktqbchZn0yhab5w",
       accessToken:
-        "ya29.A0AfH6SMD5pii72htQxwXOXZ00dWeyCZ8r6D_mFn-s1noeEbgNLqwvt8DE1eyz7mOzYd5ZX_JpxUSNWMaj6oFoC9njs0DoXqy70uJzadJ7oQGtZh7q3Z9QGtxgjcXZhWbt-j12oz8a0dLabaUgTqPRtbv4WNoM",
+        "ya29.a0AfH6SMC2EqzU7jP2uH6b2LOV0OBx2LrwXMaVO5fAKXzIgvDDkfBbH4WCL26cbqJpPMUuPVBWo9ah_suKUqh3TGQjkg3qGzfU-eY59gPGhzJ0DTGXANgRMxdoS_kJCVXB9fnU2YbwvBcGy0XLmyHymo9Te9RC",
       expires: 3599,
     },
   });
@@ -28,8 +28,6 @@ async function sendMail(email, url) {
     html: `Confirma tu correo haciendo clic en el link
           <a href="${url}"> ${url} </a>`, // html body
   });
-
-  // console.log(info);
 
   //console.log("Message sent: %s", info.messageId);
 }

@@ -54,7 +54,6 @@ async function getPostFolloweds(ctx) {
   const followeds = await Follow.find({ idUser: ctx.user.id }).populate(
     "follow"
   ); //el populate saca todos los que estamos siguiendo
-
   const followedsList = [];
 
   for await (const data of followeds) {
@@ -68,7 +67,6 @@ async function getPostFolloweds(ctx) {
     .sort({ createdAt: -1 })
     .limit(1)
     .populate("idUser");
-
   postList.push(...postsPropios);
 
   for await (const data of followedsList) {
@@ -78,9 +76,11 @@ async function getPostFolloweds(ctx) {
       })
       .sort({ createdAt: -1 })
       .populate("idUser");
+
     // .limit(5); //si queremos limitar para no sacar todas los post
     postList.push(...posts);
   }
+
   const result = postList.sort((a, b) => {
     return new Date(b.createdAt) - new Date(a.createdAt);
   });
@@ -92,7 +92,8 @@ async function getPostFolloweds(ctx) {
 async function getRecommendedPosts(ctx) {
   let businesses = [];
 
-  const items = await recommender.recommend(ctx.user.id, 3);
+  //  Se sacan las tres categorias recomendadas para este usuario
+  const items = await recommender.recommend(ctx.user.id, 1);
 
   //Buscar los posts de usuarios NEGOCIOS NO SEGUIDOS DE LOS TIPOS RECOMENDADOS
   //  Se sacan los usuarios negocio de los tipos recomendados
@@ -118,7 +119,7 @@ async function getRecommendedPosts(ctx) {
       if (
         business._id.toString() !== ctx.user.id.toString() &&
         business.state === ctx.user.state &&
-        business.town == ctx.user.town
+        business.town === ctx.user.town
       ) {
         recommendedBuses.push(business);
       }
@@ -126,7 +127,6 @@ async function getRecommendedPosts(ctx) {
   }
 
   //Se tendrá un array de usuarios negocios, buscar los posts de estos y pushear a un array para devolverlos
-
   let posts = [];
 
   for await (const bus of recommendedBuses) {

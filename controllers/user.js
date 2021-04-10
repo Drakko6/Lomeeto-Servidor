@@ -15,7 +15,17 @@ const sendMail = require("../utils/sendMail");
 const createConfirmationUrl = require("../utils/createConfirmationUrl");
 
 function createToken(user, SECRET_KEY, expiresIn) {
-  const { id, name, email, username, state, town } = user;
+  const {
+    id,
+    name,
+    email,
+    username,
+    state,
+    town,
+    business,
+    type,
+    preferences,
+  } = user;
   const payload = {
     id,
     name,
@@ -23,6 +33,9 @@ function createToken(user, SECRET_KEY, expiresIn) {
     username,
     state,
     town,
+    business,
+    type,
+    preferences,
   };
   return jwt.sign(payload, SECRET_KEY, { expiresIn });
 }
@@ -50,39 +63,7 @@ async function register(input) {
       const user = new User(newUser);
       user.save();
 
-      // Hacer que recoja las recomendaciones y hacer primer clusterización (llamar a clusterize(arrayRatings))
-
-      const firstRatings = newUser.preferences;
-      //Guardar los primeros Ratings (3)
-
-      for await (const preference of firstRatings) {
-        let newRating = new Rating({
-          user: user._id,
-          type: preference,
-          rating: 1,
-        });
-
-        await newRating.save();
-      }
-
-      //llamar a clusterize para actualizar
-      const ratings = await Rating.find();
-
-      const cleanRatings = [];
-
-      for (rat of ratings) {
-        const newRat = {
-          user: rat.user.toString(),
-          item: rat.type,
-          rating: rat.rating.toString(),
-        };
-
-        cleanRatings.push(newRat);
-      }
-
       await sendMail(newUser.email, createConfirmationUrl(user._id));
-
-      await clusterize(cleanRatings);
 
       return user;
     } catch (error) {
@@ -155,6 +136,51 @@ async function deleteAvatar(ctx) {
   }
 }
 
+async function registerFirstPreferences(input, ctx) {
+  //  Se ejecutará después de hacer primer login
+  //Se saca el id del context y se busca el user con este
+  const { id } = ctx.user;
+  try {
+    const user = await User.findById(id);
+
+    await User.findByIdAndUpdate(id, { preferences: input.preferences });
+
+    // Recoger las recomendaciones del input y hacer primer clusterización (llamar a clusterize(arrayRatings))
+    const firstRatings = input.preferences;
+    //Guardar los primeros Ratings (3)
+    for await (const preference of firstRatings) {
+      let newRating = new Rating({
+        user: user._id,
+        type: preference,
+        rating: 1,
+      });
+
+      await newRating.save();
+    }
+
+    //llamar a clusterize para actualizar
+    const ratings = await Rating.find();
+
+    const cleanRatings = [];
+
+    for (rat of ratings) {
+      const newRat = {
+        user: rat.user.toString(),
+        item: rat.type,
+        rating: rat.rating.toString(),
+      };
+
+      cleanRatings.push(newRat);
+    }
+
+    await clusterize(cleanRatings);
+    return true;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+}
+
 async function updateUser(input, ctx) {
   const { id } = ctx.user;
 
@@ -178,6 +204,7 @@ async function updateUser(input, ctx) {
 
       await User.findByIdAndUpdate(id, { password: newPasswordCrypt });
     } else {
+      //CAMBIAR OTROS DATOS DEL USUARIO
       await User.findByIdAndUpdate(id, input);
     }
 
@@ -258,4 +285,5 @@ module.exports = {
   search,
   deleteUser,
   confirmUser,
+  registerFirstPreferences,
 };

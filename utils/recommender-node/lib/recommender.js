@@ -12,7 +12,9 @@ recommender.recommend = function (userId, n) {
       const cluster = await Cluster.findOne();
 
       var clusters = cluster.cluster;
+
       var userCluster = findUserCluster(userId, clusters);
+
       var items = getItemsRating(userCluster, clusters.items);
       var sortedItems = items.sort(compare);
       var recommendation =
@@ -49,6 +51,7 @@ var getItemsRating = function (usersInCluster, items) {
   var clusterRatingMatrix = new Matrix(neighborsRatings);
   var normalizedMatrix = normalizeMatrix(clusterRatingMatrix, 4);
   var scores = sumColumns(normalizedMatrix);
+
   return getRecommendedItems(items, scores.toArray()[0], currentUserRatings[0]);
 };
 

@@ -40,6 +40,8 @@ const resolvers = {
     updateUser: (_, { input }, ctx) => userController.updateUser(input, ctx),
     deleteUser: (_, {}, ctx) => userController.deleteUser(ctx),
     confirmUser: (_, { token }) => userController.confirmUser(token),
+    registerFirstPreferences: (_, { input }, ctx) =>
+      userController.registerFirstPreferences(input, ctx),
 
     //Follow
     follow: (_, { username }, ctx) => followController.follow(username, ctx),

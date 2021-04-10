@@ -60,8 +60,6 @@ const typeDefs = gql`
     typeFile: String
     createdAt: String
     text: String
-    #Si es publicidad
-    ad: Boolean
   }
 
   type Comment {
@@ -78,7 +76,6 @@ const typeDefs = gql`
     typeFile: String
     createdAt: String
     text: String
-    ad: Boolean
   }
 
   type Hour {
@@ -125,6 +122,15 @@ const typeDefs = gql`
     months: Int
     owner: String
     description: String
+
+    ####Propiedades si es un negocio#######
+    preferences: [String]
+    business: Boolean
+    address: String
+    type: String
+    phone: [String]
+    contactEmail: String
+    schedule: [HourInput]
   }
 
   input CommentInput {
@@ -174,6 +180,7 @@ const typeDefs = gql`
     updateUser(input: UserUpdateInput): Boolean
     deleteUser: Boolean
     confirmUser(token: String): Boolean
+    registerFirstPreferences(input: UserUpdateInput): Boolean
 
     #Follow
     follow(username: String!): Boolean
