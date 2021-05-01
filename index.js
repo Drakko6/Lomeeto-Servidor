@@ -5,6 +5,7 @@ const typeDefs = require("./gql/schema");
 const resolvers = require("./gql/resolvers");
 require("dotenv").config({ path: ".env" });
 
+//  conexión a BD
 mongoose.connect(
   process.env.BBDD,
   {
