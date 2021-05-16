@@ -26,6 +26,7 @@ mongoose.connect(
 
 function server() {
   const serverApollo = new ApolloServer({
+    cors: false,
     typeDefs,
     resolvers,
     context: ({ req }) => {

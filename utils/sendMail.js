@@ -1,22 +1,39 @@
 const nodemailer = require("nodemailer");
 require("dotenv").config({ path: ".env" });
+const { google } = require("googleapis");
+const OAuth2 = google.auth.OAuth2;
+
+const oauth2Client = new OAuth2(
+  "298460132135-373ucj7l2dd683hct650qe8mg2he4mch.apps.googleusercontent.com", // ClientID
+  "WOHJtGn3_MA8Un6Hk1POEFC5", // Client Secret
+  "https://developers.google.com/oauthplayground" // Redirect URL
+);
+
+oauth2Client.setCredentials({
+  refresh_token:
+    "1//0459p5p94HYTUCgYIARAAGAQSNwF-L9Irotk0W1NM8qoJZABVevIDv1nOGSj0l76S3eu1J4hOFNeHdQhIadUXh7KUb-k2TxWSgsc",
+});
+
+const accessToken = oauth2Client.getAccessToken();
 
 async function sendMail(email, url) {
   const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true,
+    tls: {
+      rejectUnauthorized: false,
+    },
+    // host: "smtp.gmail.com",
+    service: "gmail",
+    // port: 465,
+    // secure: true,
     auth: {
       type: "OAuth2",
       user: "lomeetoinfo@gmail.com",
       clientId:
-        "298460132135-mlb1tjr3uncleans8u5e85qihgh6jq55.apps.googleusercontent.com",
-      clientSecret: "GL9J0nXldWzOX8qjLxvI1OA1",
+        "298460132135-373ucj7l2dd683hct650qe8mg2he4mch.apps.googleusercontent.com",
+      clientSecret: "WOHJtGn3_MA8Un6Hk1POEFC5",
       refreshToken:
-        "1//04YOpMOd-pG6fCgYIARAAGAQSNwF-L9Ir915CVoGqYo-u6k8Ge3VjHeReiU3REUF3xJdgbg_tkDuphdwkNS3DktqbchZn0yhab5w",
-      accessToken:
-        "ya29.a0AfH6SMC2EqzU7jP2uH6b2LOV0OBx2LrwXMaVO5fAKXzIgvDDkfBbH4WCL26cbqJpPMUuPVBWo9ah_suKUqh3TGQjkg3qGzfU-eY59gPGhzJ0DTGXANgRMxdoS_kJCVXB9fnU2YbwvBcGy0XLmyHymo9Te9RC",
-      expires: 3599,
+        "1//0459p5p94HYTUCgYIARAAGAQSNwF-L9Irotk0W1NM8qoJZABVevIDv1nOGSj0l76S3eu1J4hOFNeHdQhIadUXh7KUb-k2TxWSgsc",
+      accessToken: accessToken,
     },
   });
 
@@ -29,7 +46,7 @@ async function sendMail(email, url) {
           <a href="${url}"> ${url} </a>`, // html body
   });
 
-  //console.log("Message sent: %s", info.messageId);
+  console.log("Message sent: %s", info);
 }
 
 module.exports = sendMail;
