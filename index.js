@@ -13,7 +13,6 @@ mongoose.connect(
     useUnifiedTopology: true,
     useFindAndModify: true,
     useCreateIndex: true,
-    useFindAndModify: false,
   },
   (err, _) => {
     if (err) {
@@ -26,7 +25,6 @@ mongoose.connect(
 
 function server() {
   const serverApollo = new ApolloServer({
-    cors: false,
     typeDefs,
     resolvers,
     context: ({ req }) => {
