@@ -11,7 +11,7 @@ const oauth2Client = new OAuth2(
 
 oauth2Client.setCredentials({
   refresh_token:
-    "1//0459p5p94HYTUCgYIARAAGAQSNwF-L9Irotk0W1NM8qoJZABVevIDv1nOGSj0l76S3eu1J4hOFNeHdQhIadUXh7KUb-k2TxWSgsc",
+    "1//04OZjz9d2wzgACgYIARAAGAQSNwF-L9IrrnO7fDizbcWjrlUeTouEK6ZKErWrbYAMxEFVH-Pw5FH3HMgu6Tiaj87baTtU2c5XiVQ",
 });
 
 const accessToken = oauth2Client.getAccessToken();
@@ -32,7 +32,7 @@ async function sendMail(email, url) {
         "298460132135-373ucj7l2dd683hct650qe8mg2he4mch.apps.googleusercontent.com",
       clientSecret: "WOHJtGn3_MA8Un6Hk1POEFC5",
       refreshToken:
-        "1//0459p5p94HYTUCgYIARAAGAQSNwF-L9Irotk0W1NM8qoJZABVevIDv1nOGSj0l76S3eu1J4hOFNeHdQhIadUXh7KUb-k2TxWSgsc",
+        "1//04OZjz9d2wzgACgYIARAAGAQSNwF-L9IrrnO7fDizbcWjrlUeTouEK6ZKErWrbYAMxEFVH-Pw5FH3HMgu6Tiaj87baTtU2c5XiVQ",
       accessToken: accessToken,
     },
   });
