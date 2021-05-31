@@ -11,7 +11,7 @@ const createConfirmationUrl = (id) => {
   confirmation.save();
 
   // return `http://localhost:3000/user/confirm/${token}`;
-  return `https://lomeeto.netlify.app/user/confirm/${token} `;
+  return `https://lomeeto.me/user/confirm/${token} `;
 };
 
 module.exports = createConfirmationUrl;
