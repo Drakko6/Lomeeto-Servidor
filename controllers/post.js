@@ -93,8 +93,8 @@ async function getRecommendedPosts(ctx) {
   let businesses = [];
 
   //  Se sacan las tres categorias recomendadas para este usuario
-  const items = await recommender.recommend(ctx.user.id, 1);
-
+  const items = await recommender.recommend(ctx.user.id, 3);
+  // console.log(items);
   //Buscar los posts de usuarios NEGOCIOS NO SEGUIDOS DE LOS TIPOS RECOMENDADOS
   //  Se sacan los usuarios negocio de los tipos recomendados
   for await (const type of items) {
