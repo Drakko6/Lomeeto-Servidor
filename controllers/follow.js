@@ -23,7 +23,7 @@ async function follow(username, ctx) {
 
       if (foundRating) {
         await Rating.findOneAndUpdate(
-          { user: ctx.user.id },
+          { user: ctx.user.id, type: userFound.type },
           {
             rating: foundRating.rating + 1,
           }
