@@ -4,14 +4,13 @@ const { google } = require("googleapis");
 const OAuth2 = google.auth.OAuth2;
 
 const oauth2Client = new OAuth2(
-  "298460132135-373ucj7l2dd683hct650qe8mg2he4mch.apps.googleusercontent.com", // ClientID
-  "WOHJtGn3_MA8Un6Hk1POEFC5", // Client Secret
+  process.env.OAUTH_CLIENT_ID,
+  process.env.OAUTH_CLIENT_SECRET,
   "https://developers.google.com/oauthplayground" // Redirect URL
 );
 
 oauth2Client.setCredentials({
-  refresh_token:
-    "1//04OZjz9d2wzgACgYIARAAGAQSNwF-L9IrrnO7fDizbcWjrlUeTouEK6ZKErWrbYAMxEFVH-Pw5FH3HMgu6Tiaj87baTtU2c5XiVQ",
+  refresh_token: process.env.OAUTH_REFRESH_TOKEN,
 });
 
 const accessToken = oauth2Client.getAccessToken();
@@ -28,11 +27,9 @@ async function sendMail(email, url) {
     auth: {
       type: "OAuth2",
       user: "lomeetoinfo@gmail.com",
-      clientId:
-        "298460132135-373ucj7l2dd683hct650qe8mg2he4mch.apps.googleusercontent.com",
-      clientSecret: "WOHJtGn3_MA8Un6Hk1POEFC5",
-      refreshToken:
-        "1//04OZjz9d2wzgACgYIARAAGAQSNwF-L9IrrnO7fDizbcWjrlUeTouEK6ZKErWrbYAMxEFVH-Pw5FH3HMgu6Tiaj87baTtU2c5XiVQ",
+      clientId: process.env.OAUTH_CLIENT_ID,
+      clientSecret: process.env.OAUTH_CLIENT_SECRET,
+      refreshToken: process.env.OAUTH_REFRESH_TOKEN,
       accessToken: accessToken,
     },
   });
