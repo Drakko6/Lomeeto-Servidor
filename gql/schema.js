@@ -161,6 +161,7 @@ const typeDefs = gql`
 
     ###Para obtener post publicitarios
     getRecommendedPosts: [FeedPost]
+    getRecommendedPostsFromBusiness: [FeedPost]
 
     #Comment
     getComments(idPost: ID!): [Comment]

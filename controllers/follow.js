@@ -13,51 +13,48 @@ async function follow(username, ctx) {
       follow: userFound._id,
     });
 
-    // Es un negocio? Consultar BD USER  Ver bandera
-    if (userFound.business) {
-      //Si es negocio, buscar Rating con id de user y tipo de negocio y aumentar el contador
-      const foundRating = await Rating.findOne({
+    // buscar Rating con id de user y el id del usuario seguido y aumentar contador (crear rating)
+    const foundRating = await Rating.findOne({
+      user: ctx.user.id,
+      type: userFound._id,
+    });
+
+    if (foundRating) {
+      await Rating.findOneAndUpdate(
+        { user: ctx.user.id, type: userFound._id },
+        {
+          rating: foundRating.rating + 1,
+        }
+      );
+    } else if (!foundRating) {
+      // (Si no existe crear un nuevo rating )
+      const newRating = new Rating({
         user: ctx.user.id,
-        type: userFound.type,
+        type: userFound._id,
+        rating: 1,
       });
 
-      if (foundRating) {
-        await Rating.findOneAndUpdate(
-          { user: ctx.user.id, type: userFound.type },
-          {
-            rating: foundRating.rating + 1,
-          }
-        );
-      } else if (!foundRating) {
-        // (Si no existe crear un nuevo rating )
-        const newRating = new Rating({
-          user: ctx.user.id,
-          type: userFound.type,
-          rating: 1,
-        });
-
-        await newRating.save();
-      }
-
-      //Consultará y devolverá un array de los ratings de la BD
-      const ratings = await Rating.find();
-
-      //limpiar array de ratings
-      const cleanRatings = [];
-
-      for (rat of ratings) {
-        const newRat = {
-          user: rat.user.toString(),
-          item: rat.type,
-          rating: rat.rating.toString(),
-        };
-
-        cleanRatings.push(newRat);
-      }
-
-      //  Llamar al metodo de clusterize(array) para actualizarlo
-      clusterize(cleanRatings);
+      await newRating.save();
     }
+
+    //Consultará y devolverá un array de los ratings de la BD
+    const ratings = await Rating.find();
+
+    //limpiar array de ratings
+    const cleanRatings = [];
+
+    for (rat of ratings) {
+      const newRat = {
+        user: rat.user.toString(),
+        item: rat.type.toString(),
+        rating: rat.rating.toString(),
+      };
+
+      cleanRatings.push(newRat);
+    }
+
+    //  Llamar al metodo de clusterize(array) para actualizarlo
+    clusterize(cleanRatings);
 
     follow.save();
     return true;
@@ -84,6 +81,41 @@ async function isFollow(username, ctx) {
 
 async function unFollow(username, ctx) {
   const userFound = await User.findOne({ username });
+
+  //Bajar rating de este usuario al otro
+  // buscar Rating con id de user y el id del usuario seguido y bajar contador
+  const foundRating = await Rating.findOne({
+    user: ctx.user.id,
+    type: userFound._id,
+  });
+
+  if (foundRating) {
+    await Rating.findOneAndUpdate(
+      { user: ctx.user.id, type: userFound._id },
+      {
+        rating: foundRating.rating - 1,
+      }
+    );
+  }
+
+  //Consultará y devolverá un array de los ratings de la BD
+  const ratings = await Rating.find();
+
+  //limpiar array de ratings
+  const cleanRatings = [];
+
+  for (rat of ratings) {
+    const newRat = {
+      user: rat.user.toString(),
+      item: rat.type.toString(),
+      rating: rat.rating.toString(),
+    };
+
+    cleanRatings.push(newRat);
+  }
+
+  //  Llamar al metodo de clusterize(array) para actualizarlo
+  clusterize(cleanRatings);
 
   const follow = await Follow.deleteOne({ idUser: ctx.user.id })
     .where("follow")
@@ -124,13 +156,15 @@ async function getFolloweds(username) {
 }
 
 async function getNotFolloweds(ctx) {
-  const users = await User.find().limit(20);
+  // Reemplazar esto en el front por las recomendaciones de usuarios
+  const users = await User.find().sort({ createdAt: -1 }).limit(60);
 
-  const arrayUsers = [];
+  let arrayUsers = [];
 
   for await (const user of users) {
     const isFind = await Follow.findOne({ idUser: ctx.user.id })
       .where("follow")
+      .sort({ createdAt: -1 })
       .equals(user._id);
 
     if (!isFind) {
@@ -144,6 +178,15 @@ async function getNotFolloweds(ctx) {
         arrayUsers.push(user);
       }
     }
+  }
+  try {
+    arrayUsers.sort(function () {
+      return Math.random() - 0.5;
+    });
+
+    arrayUsers = arrayUsers.slice(0, 10);
+  } catch (error) {
+    console.log(error);
   }
 
   return arrayUsers;

@@ -65,7 +65,7 @@ async function getPostFolloweds(ctx) {
   const postsPropios = await Post.find()
     .where({ idUser: ctx.user.id })
     .sort({ createdAt: -1 })
-    .limit(1)
+    .limit(10)
     .populate("idUser");
   postList.push(...postsPropios);
 
@@ -88,21 +88,71 @@ async function getPostFolloweds(ctx) {
   return result;
 }
 
-//QUERY PARA SUGERENCIAS
+//  QUERY PARA SUGERENCIAS GENERALES
 async function getRecommendedPosts(ctx) {
+  let users = [];
+
+  try {
+    //  Se sacan las tres categorias recomendadas para este usuario
+    const items = await recommender.recommend(ctx.user.id, 3);
+    //Buscar los posts de usuarios RECOMENDADOS
+    // Por cada item recomendado, busca el usuario y hace push
+    for await (const usr of items) {
+      const user = await User.findById(usr.itemId);
+      users.push(user);
+    }
+    // Se recorren los usuarios para saber si se siguen y así sacar sus posts
+    const recommendedUsers = [];
+
+    for await (const user of users) {
+      //businesses.forEach(async (business) => {
+      const isFind = await Follow.findOne({ idUser: ctx.user.id })
+        .where("follow")
+        .equals(user._id);
+
+      if (!isFind) {
+        //Si no se sigue, se verifica que sea de la misma ciudad y no sea al mismo usuario
+        if (
+          user._id.toString() !== ctx.user.id.toString() &&
+          user.state === ctx.user.state &&
+          user.town === ctx.user.town
+        ) {
+          recommendedUsers.push(user);
+        }
+      }
+    }
+
+    //Se tendrá un array de usuarios negocios, buscar los posts de estos y pushear a un array para devolverlos
+    let posts = [];
+
+    for await (const usr of recommendedUsers) {
+      // recommendedBuses.forEach(async (bus) => {
+      let rPosts = await Post.find()
+        .where({ idUser: usr._id })
+        .sort({ createdAt: -1 })
+        .populate("idUser");
+      posts.push(...rPosts);
+    }
+
+    return posts;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+//   QUERY PARA SUGERENCIAS DE NEGOCIOS
+async function getRecommendedPostsFromBusiness(ctx) {
   let businesses = [];
 
   //  Se sacan las tres categorias recomendadas para este usuario
   const items = await recommender.recommend(ctx.user.id, 3);
   // console.log(items);
-  //Buscar los posts de usuarios NEGOCIOS NO SEGUIDOS DE LOS TIPOS RECOMENDADOS
-  //  Se sacan los usuarios negocio de los tipos recomendados
-  for await (const type of items) {
-    const users = await User.find({ business: true })
-      .where("type")
-      .equals(type.itemId);
-
-    businesses.push(...users);
+  //Buscar los posts de usuarios RECOMENDADOS
+  for await (const usr of items) {
+    const user = await User.findOne({ _id: usr.itemId, business: true });
+    if (user) {
+      businesses.push(user);
+    }
   }
 
   // Se recorren los negocios para saber si se siguen y así sacar sus posts
@@ -146,4 +196,5 @@ module.exports = {
   getPosts,
   getPostFolloweds,
   getRecommendedPosts,
+  getRecommendedPostsFromBusiness,
 };

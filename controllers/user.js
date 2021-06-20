@@ -137,6 +137,7 @@ async function deleteAvatar(ctx) {
 }
 
 async function registerFirstPreferences(input, ctx) {
+  // APAGAR ESTA FUNCIÓN EN EL FRONT
   //  Se ejecutará después de hacer primer login
   //Se saca el id del context y se busca el user con este
   const { id } = ctx.user;
@@ -145,35 +146,35 @@ async function registerFirstPreferences(input, ctx) {
 
     await User.findByIdAndUpdate(id, { preferences: input.preferences });
 
-    // Recoger las recomendaciones del input y hacer primer clusterización (llamar a clusterize(arrayRatings))
-    const firstRatings = input.preferences;
-    //Guardar los primeros Ratings (3)
-    for await (const preference of firstRatings) {
-      let newRating = new Rating({
-        user: user._id,
-        type: preference,
-        rating: 1,
-      });
+    // // Recoger las recomendaciones del input y hacer primer clusterización (llamar a clusterize(arrayRatings))
+    // const firstRatings = input.preferences;
+    // //Guardar los primeros Ratings (3)
+    // for await (const preference of firstRatings) {
+    //   let newRating = new Rating({
+    //     user: user._id,
+    //     type: preference,
+    //     rating: 1,
+    //   });
 
-      await newRating.save();
-    }
+    //   await newRating.save();
+    // }
 
-    //llamar a clusterize para actualizar
-    const ratings = await Rating.find();
+    // //llamar a clusterize para actualizar
+    // const ratings = await Rating.find();
 
-    const cleanRatings = [];
+    // const cleanRatings = [];
 
-    for (rat of ratings) {
-      const newRat = {
-        user: rat.user.toString(),
-        item: rat.type,
-        rating: rat.rating.toString(),
-      };
+    // for (rat of ratings) {
+    //   const newRat = {
+    //     user: rat.user.toString(),
+    //     item: rat.type,
+    //     rating: rat.rating.toString(),
+    //   };
 
-      cleanRatings.push(newRat);
-    }
+    //   cleanRatings.push(newRat);
+    // }
 
-    await clusterize(cleanRatings);
+    // await clusterize(cleanRatings);
     return true;
   } catch (error) {
     console.log(error);

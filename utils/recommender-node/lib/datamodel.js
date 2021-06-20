@@ -1,7 +1,3 @@
-/**
- * Created by Juan Ospina on 4/05/17.
- */
-
 var fs = require("fs");
 var d3 = require("d3");
 var jd = require("jsdataframe");
@@ -35,7 +31,6 @@ datamodel.loadDataset = function (path) {
 };
 
 datamodel.loadDatasetFromArray = function (dataArray) {
-  console.log("ARRAY:", dataArray);
   return new Promise(function (resolve, reject) {
     if (dataArray == null || dataArray.length == 0) {
       reject("El array de ratings está vacío");

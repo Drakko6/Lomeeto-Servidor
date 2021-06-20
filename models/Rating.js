@@ -12,8 +12,9 @@ const RatingSchema = Schema({
 
   //  Tipo de negocio que sigue
   type: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
     require: true,
+    ref: "User",
   },
 
   //  Rating
